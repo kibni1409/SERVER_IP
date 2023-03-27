@@ -1,8 +1,11 @@
+// Подключили библиотеки
 const express = require('express');
 const axios = require('axios');
+const cors = require('cors');
 
 //Настройки APP
 const app = express();
+app.use(cors());
 app.use(express.json());
 
 //Объявление ключевый переменных
@@ -18,21 +21,20 @@ const instance = axios.create({
 //Авторизация
 // req: { login: string, password: string }
 // res: { login: string }
-app.get('/users', (req, res) => {
+app.put('/users', (req, res) => {
     instance.get('/b/' + '641edfdface6f33a22fadc2f').then((response) => {
         let users = response.data.record.users
         let result = users.find((el) => el.login === req.body.login && el.password === req.body.password)
         if(result === undefined) {
-            res.json({
-                message: "Invalid login or password",
-                statuscode: 401
-            })
+            throw new Error('Invalid login or password')
         } else {
             res.json({
-                login: result.login,
-                statuscode: 200
+                ...result,
+                statusCode: 200
             })
         }
+    }).catch((err) => {
+        res.status(401).send({message: err.message});
     })
 })
 
@@ -77,6 +79,32 @@ app.put('/store/edit', (req, res) => {
     }).then((response) => {
         res.json({
             store: response.data.record.store
+        })
+    }).catch((err) => {
+        res.json({
+            message: err.message
+        })
+    })
+})
+
+//Запрос на получения хранилища
+app.get('/store/:storeID', (req, res) => {
+    instance.get('/b/' +req.params.storeID, ).then((response) => {
+        res.json({
+            store: response.data.record.store
+        })
+    }).catch((err) => {
+        res.json({
+            message: err.message
+        })
+    })
+})
+
+//Запрос на получения продуктов
+app.get('/products/:productsID', (req, res) => {
+    instance.get('/b/' +req.params.productsID, ).then((response) => {
+        res.json({
+            products: response.data.record.products
         })
     }).catch((err) => {
         res.json({
