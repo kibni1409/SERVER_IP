@@ -10,7 +10,7 @@ app.use(express.json());
 
 //Объявление ключевый переменных
 const port = 8081;
-const hostname = '192.168.0.8';
+const hostname = '192.168.0.6';
 const instance = axios.create({
     baseURL: 'https://api.jsonbin.io/v3',
     headers: {
@@ -76,9 +76,13 @@ app.put('/products/edit', (req, res) => {
 app.put('/store/edit', (req, res) => {
     instance.put('/b/' + req.body.storeID, {
         "store": req.body.storeArray,
+        "totalCount": req.body.totalCount,
+        "nextID": req.body.nextID
     }).then((response) => {
         res.json({
-            store: response.data.record.store
+            store: response.data.record.store,
+            totalCount: response.data.record.totalCount,
+            nextID: response.data.record.nextID
         })
     }).catch((err) => {
         res.json({
@@ -89,9 +93,11 @@ app.put('/store/edit', (req, res) => {
 
 //Запрос на получения хранилища
 app.get('/store/:storeID', (req, res) => {
-    instance.get('/b/' +req.params.storeID, ).then((response) => {
+    instance.get('/b/' +req.params.storeID + '/1', ).then((response) => {
         res.json({
-            store: response.data.record.store
+            store: response.data.record.store,
+            totalCount: response.data.record.totalCount,
+            nextID: response.data.record.nextID
         })
     }).catch((err) => {
         res.json({
