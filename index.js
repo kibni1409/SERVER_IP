@@ -19,8 +19,6 @@ const instance = axios.create({
 })
 
 //Авторизация
-// req: { login: string, password: string }
-// res: { login: string }
 app.put('/users', (req, res) => {
     instance.get('/b/' + '641edfdface6f33a22fadc2f').then((response) => {
         let users = response.data.record.users
@@ -38,30 +36,17 @@ app.put('/users', (req, res) => {
     })
 })
 
-//Запрос на получение продуктов
-// req: { productsID: string }
-// res: { products: Array[Object] }
-app.get('/products', (req, res) => {
-    instance.get('/b/' + req.body.productsID).then((response) => {
-        res.json({
-            products: response.data.record.products
-        })
-    }).catch((err) => {
-        res.json({
-            message: err.message
-        })
-    })
-})
-
 //Запрос на обновление данных о продуктах
-// req : { productsID: string, productsArray = Array[Object] }
-// res: { products: Array[Object] }
 app.put('/products/edit', (req, res) => {
     instance.put('/b/' + req.body.productsID, {
         "products": req.body.productsArray,
+        "totalCount": req.body.totalCount,
+        "nextID": req.body.nextID
     }).then((response) => {
         res.json({
-            products: response.data.record.products
+            products: response.data.record.products,
+            nextId: response.data.record.nextID,
+            totalCount: response.data.record.totalCount
         })
     }).catch((err) => {
         res.json({
@@ -70,9 +55,7 @@ app.put('/products/edit', (req, res) => {
     })
 })
 
-//Запрос на обновление данных о хранилище]
-// req : { storeID: string, storeArray = Array[Object] }
-// res: { store: Array[Object] }
+//Запрос на обновление данных о хранилище
 app.put('/store/edit', (req, res) => {
     instance.put('/b/' + req.body.storeID, {
         "store": req.body.storeArray,
@@ -93,7 +76,7 @@ app.put('/store/edit', (req, res) => {
 
 //Запрос на получения хранилища
 app.get('/store/:storeID', (req, res) => {
-    instance.get('/b/' +req.params.storeID + '/1', ).then((response) => {
+    instance.get('/b/' + req.params.storeID + '/1', ).then((response) => {
         res.json({
             store: response.data.record.store,
             totalCount: response.data.record.totalCount,
@@ -110,7 +93,9 @@ app.get('/store/:storeID', (req, res) => {
 app.get('/products/:productsID', (req, res) => {
     instance.get('/b/' +req.params.productsID, ).then((response) => {
         res.json({
-            products: response.data.record.products
+            products: response.data.record.products,
+            totalCount: response.data.record.totalCount,
+            nextID: response.data.record.nextID
         })
     }).catch((err) => {
         res.json({
